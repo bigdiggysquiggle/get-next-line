@@ -1,0 +1,126 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/09 14:10:26 by dromansk          #+#    #+#             */
+/*   Updated: 2018/11/13 19:19:47 by dromansk         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "get_next_line.h"
+#include <stdio.h>//delete for sheezy mah neezy
+
+t_list		*check_tmp(t_list *list, int fd)
+{
+	if (list == NULL)
+	{
+		list = ft_lstnew(ft_strnew(0), (size_t)fd);
+		return (list);
+	}
+	else if (!(list->content) && list->content_size == 0)
+	{
+		list->content = ft_strnew(0);
+		list->content_size = (size_t)fd;
+	}
+	else if (list->content_size != (size_t)fd)
+	{
+		while (list->content_size != (size_t)fd && list->next)
+		{
+			list = list->next;
+			if (list->content_size == (size_t)fd)
+				return (list);
+		}
+		if (list->next == NULL)
+		{
+			list->next = ft_lstnew(ft_strnew(1), (size_t)fd);
+			return (list->next);
+		}
+	}
+	return (list);
+}
+
+char		*check_line(char **str)
+{
+	if (str == NULL)
+		return (NULL);
+	else if (str != NULL && *str == NULL)
+		return (ft_strnew(1));
+	else
+		return (*str);
+}
+
+void		list_free_or_skip(t_list **list, int fd, int a, int b, int len)
+{
+
+	t_list *next;
+	t_list *prev;
+	char	*tmp;
+
+	if (a == BUFF_SIZE && len)
+	{
+		tmp = ft_str((*list)->content, b, len);
+		free((*list)->content);
+		(*list)->content = tmp;
+	else
+	{
+		prev = (*list);
+		(*list)= (*list)->next;
+		while ((*list)->content_size != (size_t)fd)
+		{
+			(*list) = (*list)->next;
+			prev = prev->next;
+		}
+		next = (*list)->next;
+		ft_memdel(&((*list)->content));
+		free(&((*list)->content_size));
+		prev = next;
+	}
+}
+
+char		*a_or_b(char *buf, size_t a, size_t b, size_t len)
+{
+	if (b <= len)
+		return (ft_strsub(buf, 0, b));
+	else
+		return (ft_strsub(buf, 0, a));
+}
+
+int			get_next_line(const int fd, char **line)
+{
+	int				a;
+	int				b;
+	char			buf[BUFF_SIZE + 1];
+	static t_list	*list;
+	t_list			*tmp;
+
+	printf("checking tmp\n");//delete later
+	tmp = check_tmp(list, fd);
+	printf("passed. other error checks.\n");//delete later
+	if (0 > fd || line == NULL || read(fd, buf, 0) < 0 ||
+			!(*line = check_line(line)) || tmp->content == NULL)
+		return (-1);
+	printf("passed\n");//delete later
+	b = chr_n_index(tmp->content, '\n', (int)ft_strlen(tmp->content));
+	printf("b set to %d\n-begin while loop-\n", b);//delete later
+	while ((a = read(fd, buf, BUFF_SIZE)))
+	{
+		buf[a] = '\0';
+		printf("buf contents: %s\n", buf);//delete later
+		tmp->content = ft_strjoin(tmp->content, buf);
+		printf("wrote to tmp: %s\n", (tmp->content));//delete later
+		b = chr_n_index((char *)tmp->content, '\n', ft_strlen((char *)tmp->content));
+		printf("a set to %d\nb set to %d\n", a, b);//delete later
+		if (b > 0)
+			break ;
+	}
+	printf("-end loop-\n");//delete later
+	*line = a_or_b(tmp->content, (size_t)a, (size_t)b, ft_strlen(tmp->content));
+	printf("*line set to \"%s\"\n", *line);//delete later
+	list_free_or_skip(&list, fd, a, ++b, ft_strlen(tmp->content));
+	if (a < BUFF_SIZE && !ft_strlen(tmp->content))
+		return (0);
+	return (1);
+}
