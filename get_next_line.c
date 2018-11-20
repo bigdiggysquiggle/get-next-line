@@ -6,14 +6,14 @@
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/09 14:10:26 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/19 14:48:37 by dromansk         ###   ########.fr       */
+/*   Updated: 2018/11/19 17:31:24 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-t_list	*sanity_check(t_list **list, int fd, char **line)
+static t_list	*sanity_check(t_list **list, int fd, char **line)
 {
 	t_list		*curr;
 
@@ -33,7 +33,7 @@ t_list	*sanity_check(t_list **list, int fd, char **line)
 	return (*list);
 }
 
-int		a_or_b(size_t a, size_t b, size_t len)
+int				a_or_b(size_t a, size_t b, size_t len)
 {
 	if (b <= len)
 		return ((int)b);
@@ -41,7 +41,7 @@ int		a_or_b(size_t a, size_t b, size_t len)
 		return ((int)a);
 }
 
-char	*list_advance(t_list **list, char *buf, int fd, int a)
+char			*list_advance(t_list **list, char *buf, int fd, int a)
 {
 	char		*line;
 	t_list		*next;
@@ -52,10 +52,7 @@ char	*list_advance(t_list **list, char *buf, int fd, int a)
 	{
 		len = ft_strlen(buf);
 		line = ft_strsub(buf, 0, a);
-		if (buf[a] != '\0')
-			(*list)->content += (a + 1);
-		else
-			(*list)->content += a;
+		(*list)->content += (buf[a] != '\0') ? (a + 1) : a;
 	}
 	if (list && *list)
 		next = (*list)->next;
@@ -72,7 +69,7 @@ char	*list_advance(t_list **list, char *buf, int fd, int a)
 	return (line);
 }
 
-int		get_next_line(const int fd, char **line)
+int				get_next_line(const int fd, char **line)
 {
 	int				a;
 	int				b;
@@ -97,6 +94,10 @@ int		get_next_line(const int fd, char **line)
 	*line = list_advance(&tmp, tmp->content, fd,
 			a_or_b(a, b, ft_strlen(tmp->content)));
 	if (a == 0 && !ft_strlen(*line))
+	{
+		ft_putstr("0\n");
 		return (0);
+	}
+	ft_putstr("1\n");
 	return (1);
 }
