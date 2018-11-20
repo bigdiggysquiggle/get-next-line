@@ -6,7 +6,7 @@
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/09 14:10:26 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/19 19:54:28 by dromansk         ###   ########.fr       */
+/*   Updated: 2018/11/19 20:00:27 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,9 @@ int				a_or_b(size_t a, size_t b, size_t len)
 char			*list_advance(t_list **list, char *buf, int a)
 {
 	char		*line;
-	t_list		*next;
 	size_t		len;
 
 	line = NULL;
-	next = NULL;
 	if (buf)
 	{
 		len = ft_strlen(buf);
@@ -58,11 +56,6 @@ char			*list_advance(t_list **list, char *buf, int a)
 		a = (buf[a] != '\0') ? (a + 1) : a;
 		(*list)->content = ft_strsub(buf, a, len - a);
 	}
-	if (list && *list)
-		next = (*list)->next;
-	else if (((*list)->content == NULL || !(ft_strlen((*list)->content)))
-			&& next)
-		*list = next;
 	return (line);
 }
 
