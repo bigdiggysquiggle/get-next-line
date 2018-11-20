@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 static t_list	*sanity_check(t_list **list, int fd, char **line)
 {
@@ -33,6 +32,35 @@ static t_list	*sanity_check(t_list **list, int fd, char **line)
 	return (*list);
 }
 
+void	list_remove(t_list **begin_list, int fd)
+{
+	t_list	*last;
+	t_list	*curr;
+	t_list	*temp;
+
+	last = NULL;
+	curr = *begin_list;
+	temp = NULL;
+	while (curr)
+	{
+		if (curr->content_size == (size_t)fd)
+		{
+			if (curr == *begin_list)
+				*begin_list = curr->next;
+			else
+				last->next = curr->next;
+			temp = curr;
+			curr = curr->next;
+			free(temp);
+		}
+		else
+		{
+			last = curr;
+			curr = curr->next;
+		}
+	}
+}
+
 int				a_or_b(size_t a, size_t b, size_t len)
 {
 	if (b <= len)
@@ -41,9 +69,10 @@ int				a_or_b(size_t a, size_t b, size_t len)
 		return ((int)a);
 }
 
-char			*list_advance(t_list **list, char *buf, int a)
+char			*list_advance(t_list **list, char *buf, int a, int fd)
 {
 	char		*line;
+	char		*temp;
 	size_t		len;
 
 	line = NULL;
@@ -51,10 +80,13 @@ char			*list_advance(t_list **list, char *buf, int a)
 	{
 		len = ft_strlen(buf);
 		line = ft_strsub(buf, 0, a);
+		a = (buf[a] != '\0') ? (a + 1) : a;
+		temp = ft_strsub(buf, a, ft_strlen(buf + a));
 		if ((*list)->content)
 			free((*list)->content);
-		a = (buf[a] != '\0') ? (a + 1) : a;
-		(*list)->content = ft_strsub(buf, a, len - a);
+		(*list)->content = temp;
+		if (!ft_strlen((*list)->content))
+		//	list_remove(list, fd);
 	}
 	return (line);
 }
@@ -82,7 +114,7 @@ int				get_next_line(const int fd, char **line)
 			break ;
 	}
 	*line = list_advance(&tmp, tmp->content,
-			a_or_b(a, b, ft_strlen(tmp->content)));
+			a_or_b(a, b, ft_strlen(tmp->content)), fd);
 	if (a == 0 && !ft_strlen(*line))
 		return (0);
 	return (1);
