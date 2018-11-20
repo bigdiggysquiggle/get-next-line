@@ -6,7 +6,7 @@
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/09 14:10:26 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/19 19:42:46 by dromansk         ###   ########.fr       */
+/*   Updated: 2018/11/19 19:54:28 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,14 @@ int				a_or_b(size_t a, size_t b, size_t len)
 		return ((int)a);
 }
 
-char			*list_advance(t_list **list, char *buf, int fd, int a)
+char			*list_advance(t_list **list, char *buf, int a)
 {
 	char		*line;
 	t_list		*next;
 	size_t		len;
 
 	line = NULL;
+	next = NULL;
 	if (buf)
 	{
 		len = ft_strlen(buf);
@@ -59,13 +60,6 @@ char			*list_advance(t_list **list, char *buf, int fd, int a)
 	}
 	if (list && *list)
 		next = (*list)->next;
-	if ((*list)->content != NULL)
-	{
-		*list = ft_lstnew((*list)->content, ft_strlen((*list)->content));
-		(*list)->content_size = fd;
-		if (next)
-			(*list)->next = next;
-	}
 	else if (((*list)->content == NULL || !(ft_strlen((*list)->content)))
 			&& next)
 		*list = next;
@@ -94,7 +88,7 @@ int				get_next_line(const int fd, char **line)
 		if (b > 0)
 			break ;
 	}
-	*line = list_advance(&tmp, tmp->content, fd,
+	*line = list_advance(&tmp, tmp->content,
 			a_or_b(a, b, ft_strlen(tmp->content)));
 	if (a == 0 && !ft_strlen(*line))
 		return (0);
