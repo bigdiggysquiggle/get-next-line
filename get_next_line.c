@@ -76,19 +76,21 @@ char			*list_advance(t_list **list, char *buf, int a, int fd)
 	size_t		len;
 
 	line = NULL;
-	if (buf)
+	if (ft_strlen(buf))
 	{
 		len = ft_strlen(buf);
 		line = ft_strsub(buf, 0, a);
 		a = (buf[a] != '\0') ? (a + 1) : a;
 		temp = ft_strsub(buf, a, ft_strlen(buf + a));
-		if ((*list)->content)
+		a = (int)ft_strlen((*list)->content);
+		if (a != 0)
 			free((*list)->content);
 		(*list)->content = temp;
 		if (!ft_strlen((*list)->content))
-		//	list_remove(list, fd);
+			list_remove(list, fd);
+		return (line);
 	}
-	return (line);
+	return (buf);
 }
 
 int				get_next_line(const int fd, char **line)
