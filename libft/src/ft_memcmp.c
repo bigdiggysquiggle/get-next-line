@@ -1,25 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_memcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/09 14:09:18 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/20 18:27:18 by dromansk         ###   ########.fr       */
+/*   Created: 2018/10/22 16:30:24 by dromansk          #+#    #+#             */
+/*   Updated: 2018/11/01 17:44:45 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# include <stdlib.h>
-# include <unistd.h>
-# include <string.h>
-# include "libft.h"
+#include "libft.h"
 
-# define BUFF_SIZE 9999
+int		ft_memcmp(const void *s1, const void *s2, size_t n)
+{
+	const unsigned char *st1;
+	const unsigned char *st2;
 
-int		ft_new_line(char **s, char **line, int fd, int ret);
-int		get_next_line(const int fd, char **line);
-
-#endif
+	st1 = s1;
+	st2 = s2;
+	if (n)
+	{
+		while (*st1 == *st2 && n-- > 1)
+		{
+			st1++;
+			st2++;
+		}
+		return (*st1 - *st2);
+	}
+	else
+		return (0);
+}

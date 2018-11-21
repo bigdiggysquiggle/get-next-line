@@ -1,25 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/09 14:09:18 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/20 18:27:18 by dromansk         ###   ########.fr       */
+/*   Created: 2018/10/31 17:37:37 by dromansk          #+#    #+#             */
+/*   Updated: 2018/11/01 18:00:38 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# include <stdlib.h>
-# include <unistd.h>
-# include <string.h>
-# include "libft.h"
+#include "libft.h"
 
-# define BUFF_SIZE 9999
+char		*ft_strnstr(const char *haystack, const char *needle, size_t len)
+{
+	size_t a;
+	size_t b;
 
-int		ft_new_line(char **s, char **line, int fd, int ret);
-int		get_next_line(const int fd, char **line);
-
-#endif
+	a = 0;
+	if (*haystack == '\0' && *needle == '\0')
+		return ((char *)haystack);
+	while (a < len && haystack[a])
+	{
+		b = 0;
+		while (a + b < len && needle[b] && haystack[a + b] == needle[b])
+			b++;
+		if (!needle[b])
+			return ((char *)haystack + a);
+		a++;
+	}
+	return (NULL);
+}

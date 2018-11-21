@@ -1,25 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strmapi.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/09 14:09:18 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/20 18:27:18 by dromansk         ###   ########.fr       */
+/*   Created: 2018/10/23 17:15:28 by dromansk          #+#    #+#             */
+/*   Updated: 2018/11/08 16:45:24 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# include <stdlib.h>
-# include <unistd.h>
-# include <string.h>
-# include "libft.h"
+#include "libft.h"
 
-# define BUFF_SIZE 9999
+char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
+{
+	unsigned int	a;
+	char			*n;
 
-int		ft_new_line(char **s, char **line, int fd, int ret);
-int		get_next_line(const int fd, char **line);
-
-#endif
+	if (s == NULL || *s == '\0' || f == NULL)
+		return (NULL);
+	a = 0;
+	n = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
+	if (n == NULL)
+		return (NULL);
+	while (s[a] != '\0')
+	{
+		n[a] = f(a, s[a]);
+		a++;
+	}
+	n[a] = '\0';
+	return (n);
+}

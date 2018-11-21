@@ -5,119 +5,61 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dromansk <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/09 14:10:26 by dromansk          #+#    #+#             */
-/*   Updated: 2018/11/19 20:16:50 by dromansk         ###   ########.fr       */
+/*   Created: 2018/11/20 18:26:19 by dromansk          #+#    #+#             */
+/*   Updated: 2018/11/20 18:34:26 by dromansk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static t_list	*sanity_check(t_list **list, int fd, char **line)
+int		ft_new_line(char **s, char **line, int fd, int ret)
 {
-	t_list		*curr;
+	char	*tmp;
+	int		i;
 
-	if (list == NULL || line == NULL || fd < 0)
-		return (NULL);
-	if ((line != NULL) && *line == NULL)
-		*line = ft_strnew(0);
-	curr = *list;
-	while (curr)
+	i = chr_index(s[fd], '\n');
+	if (s[fd][i] == '\n')
 	{
-		if ((int)curr->content_size == fd)
-			return (curr);
-		curr = curr->next;
+		*line = ft_strsub(s[fd], 0, i);
+		tmp = ft_strdup(s[fd] + i + 1);
+		free(s[fd]);
+		s[fd] = tmp;
+		if (s[fd][0] == '\0')
+			ft_strdel(&s[fd]);
 	}
-	curr = ft_lstnew("\0", fd);
-	ft_lstadd(list, curr);
-	return (*list);
-}
-
-void	list_remove(t_list **begin_list, int fd)
-{
-	t_list	*last;
-	t_list	*curr;
-	t_list	*temp;
-
-	last = NULL;
-	curr = *begin_list;
-	temp = NULL;
-	while (curr)
+	else if (s[fd][i] == '\0')
 	{
-		if (curr->content_size == (size_t)fd)
-		{
-			if (curr == *begin_list)
-				*begin_list = curr->next;
-			else
-				last->next = curr->next;
-			temp = curr;
-			curr = curr->next;
-			free(temp);
-		}
-		else
-		{
-			last = curr;
-			curr = curr->next;
-		}
+		if (ret == BUFF_SIZE)
+			return (get_next_line(fd, line));
+		*line = ft_strdup(s[fd]);
+		ft_strdel(&s[fd]);
 	}
+	return (1);
 }
 
-int				a_or_b(size_t a, size_t b, size_t len)
+int		get_next_line(const int fd, char **line)
 {
-	if (b <= len)
-		return ((int)b);
-	else
-		return ((int)a);
-}
+	static char	*s[255];
+	char		buf[BUFF_SIZE + 1];
+	char		*tmp;
+	int			ret;
 
-char			*list_advance(t_list **list, char *buf, int a, int fd)
-{
-	char		*line;
-	char		*temp;
-	size_t		len;
-
-	line = NULL;
-	if (ft_strlen(buf))
-	{
-		len = ft_strlen(buf);
-		line = ft_strsub(buf, 0, a);
-		a = (buf[a] != '\0') ? (a + 1) : a;
-		temp = ft_strsub(buf, a, ft_strlen(buf + a));
-		a = (int)ft_strlen((*list)->content);
-		if (a != 0)
-			free((*list)->content);
-		(*list)->content = temp;
-		if (!ft_strlen((*list)->content))
-			list_remove(list, fd);
-		return (line);
-	}
-	return (buf);
-}
-
-int				get_next_line(const int fd, char **line)
-{
-	int				a;
-	int				b;
-	char			buf[BUFF_SIZE + 1];
-	static t_list	*list;
-	t_list			*tmp;
-
-	tmp = sanity_check(&list, fd, line);
-	if (fd < 0 || line == NULL || read(fd, buf, 0) < 0 ||
-			!(*line) || tmp->content == NULL)
+	if (fd < 0 || line == NULL)
 		return (-1);
-	b = chr_n_index(tmp->content, '\n', (int)ft_strlen(tmp->content));
-	while ((a = read(fd, buf, BUFF_SIZE)))
+	while ((ret = read(fd, buf, BUFF_SIZE)) > 0)
 	{
-		buf[a] = '\0';
-		tmp->content = ft_strjoin(tmp->content, buf);
-		b = chr_n_index((char *)tmp->content, '\n',
-				ft_strlen((char *)tmp->content));
-		if (b > 0)
+		buf[ret] = '\0';
+		if (s[fd] == NULL)
+			s[fd] = ft_strnew(1);
+		tmp = ft_strjoin(s[fd], buf);
+		free(s[fd]);
+		s[fd] = tmp;
+		if (ft_strchr(buf, '\n'))
 			break ;
 	}
-	*line = list_advance(&tmp, tmp->content,
-			a_or_b(a, b, ft_strlen(tmp->content)), fd);
-	if (a == 0 && !ft_strlen(*line))
+	if (ret < 0)
+		return (-1);
+	else if (ret == 0 && (s[fd] == NULL || s[fd][0] == '\0'))
 		return (0);
-	return (1);
+	return (ft_new_line(s, line, fd, ret));
 }
